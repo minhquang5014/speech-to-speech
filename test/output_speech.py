@@ -3,10 +3,13 @@ from scipy.io.wavfile import write
 
 def save_file_input_mp3(input_array, output_path):
     """unnormalize the data, save the data in the cpu, convert back to numpy array in the int16 format and save it in to mp3 sound file"""
-    unnormalized_data = input_array * 32767
+    try:
+        unnormalized_data = input_array * 32767
 
-    audio_array = unnormalized_data.cpu().numpy().flatten()
-    # int_audio_array = np.int16(audio_array)
-    write(output_path, 22050, audio_array)
-    
+        audio_array = unnormalized_data.cpu().numpy().flatten()
+        int_audio_array = np.int16(audio_array)
+        write(output_path, 22050, int_audio_array)
+        print(f"write successfully to file {output_path}")
+    except Exception as e:
+        print(f"error writing the audio file: {e}")
 

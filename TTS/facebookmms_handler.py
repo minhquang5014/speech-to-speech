@@ -61,7 +61,7 @@ class FacebookMMSTTSHandler(BaseHandler):
     def setup(
         self,
         should_listen,
-        device="cuda",
+        device = "cpu",
         torch_dtype="float32",
         language="en",
         stream=True,
@@ -70,6 +70,7 @@ class FacebookMMSTTSHandler(BaseHandler):
     ):
         self.should_listen = should_listen
         self.device = device
+        print(self.device)
         self.torch_dtype = getattr(torch, torch_dtype)
         self.stream = stream
         self.chunk_size = chunk_size
@@ -81,7 +82,7 @@ class FacebookMMSTTSHandler(BaseHandler):
     def load_model(self, language_code):
         try:
             model_name = f"facebook/mms-tts-{WHISPER_LANGUAGE_TO_FACEBOOK_LANGUAGE[language_code]}"
-            logger.info(f"Loading model: {model_name}")
+            logger.info(f"Loading model: {model_name} on {self.device}")
             self.model = VitsModel.from_pretrained(model_name).to(self.device)
             self.tokenizer = AutoTokenizer.from_pretrained(model_name)
             self.language = language_code
