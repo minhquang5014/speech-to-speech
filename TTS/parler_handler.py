@@ -12,18 +12,27 @@ import logging
 from rich.console import Console
 from utils.utils import next_power_of_2
 from transformers.utils.import_utils import (
-    is_flash_attn_2_available,
+    is_flash_attn_2_available,  # check if flash-attention module is available for optimization
 )
 
-torch._inductor.config.fx_graph_cache = True
+"""Models liek ParlerTTS use attention mechanisms for generating speech or text outputs
+These tasks involve handling long sequences, like audio waveforms or text tokens
+
+Flash attention 2 makes it more feasible to process larger sequences on GPUs 
+withouth running into memory constraints or excessive computational time."""
+
+# enables caching of computation graphs for optimization
+torch._inductor.config.fx_graph_cache = True 
+
 # mind about this parameter ! should be >= 2 * number of padded prompt sizes for TTS
+# sets tha cache size for dynamic graph compilation to 15
 torch._dynamo.config.cache_size_limit = 15
 
 logger = logging.getLogger(__name__)
 
 console = Console()
 
-
+# If cuda is available and flash attention 2 is not, sending out a warning message
 if not is_flash_attn_2_available() and torch.cuda.is_available():
     logger.warn(
         """Parler TTS works best with flash attention 2, but is not installed
@@ -56,8 +65,9 @@ class ParlerTTSHandler(BaseHandler):
         description=(
             "Jenny speaks at a slightly slow pace with an animated delivery with clear audio quality."
         ),
+        # play step second parameter - number of seconds for each audio chunk to play
         play_steps_s=1,
-        blocksize=512,
+        blocksize=512,   # size of audio chunk for streaming
         use_default_speakers_list=True,
     ):
         self.should_listen = should_listen

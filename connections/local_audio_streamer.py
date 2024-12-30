@@ -28,6 +28,7 @@ class LocalAudioStreamer:
                 outdata[:] = 0 * outdata
             else:
                 outdata[:] = self.output_queue.get()[:, np.newaxis]
+                # outdata[:] = 0 * outdata
 
         logger.debug("Available devices:")
         logger.debug(sd.query_devices())
@@ -41,4 +42,4 @@ class LocalAudioStreamer:
             logger.info("Starting local audio stream")
             while not self.stop_event.is_set():
                 time.sleep(0.001)
-            print("Stopping recording")
+            print("Stop recording")
