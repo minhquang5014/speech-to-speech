@@ -11,7 +11,7 @@ import threading
 import queue
 import torch
 from scipy.io.wavfile import write
-from output_speech import save_file_input_mp3
+from output_speech import output_audio_stream_with_pyaudio, output_audio_stream_with_sd
 
 def load_model_and_run_inference():
     stop_event = threading.Event()
@@ -24,9 +24,10 @@ def load_model_and_run_inference():
     text = """The Israeli airstrikes, including on ports and energy infrastructure in the capital Sanaa, 
     were retaliation for Houthi missile and drone attacks on Israel over the past year, most of which were intercepted, the Israel Defense Forces (IDF) said in a statement."""
     wav_form = chat.generate_audio(text)
-    save_file_input_mp3(wav_form, "test_output.mp3")
+    output_audio_stream_with_sd(wav_form)
 
 def finetune_model(text):
+    ### TODO: tweak the parameter so that the model can speak slowly
     model_name = "facebook/mms-tts-eng"
     device = "cpu"
     model = VitsModel.from_pretrained(model_name).to(device)
@@ -40,4 +41,4 @@ def finetune_model(text):
     print(model, tokenizer)
     return output.waveform
 if __name__ == "__main__":
-    finetune_model()
+    load_model_and_run_inference()
